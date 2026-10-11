@@ -1,0 +1,5 @@
+(1) Running `time ./grep instance data/warnpeace.txt help` reports real, user, and sys time. Real is the elapsed wall-clock time, user is CPU time spent running the program's code, and sys is CPU time spent in operating-system calls such as file reads. On this machine the serial run took about 0.02 seconds of real time, with about 0.02 seconds of user time and 0.00 seconds of system time.
+
+(2) A data race would occur if every pthread updated one shared count or instance array. I avoided that by giving each worker its own count and instance array. The main thread waits for every worker with pthread_join and then combines the private results in chunk order, so no mutex is needed and no two threads write to the same result data.
+
+(3) The POSIX implementation explicitly creates and joins pthreads and passes a worker argument structure to each thread. The OpenMP implementation prepares the same disjoint file chunks but uses a parallel-for directive to distribute them. OpenMP manages thread creation, scheduling, and synchronization at the end of the loop, while both versions retain per-worker results and merge them afterward to avoid data races.
